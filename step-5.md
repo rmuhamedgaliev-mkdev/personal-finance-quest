@@ -56,7 +56,7 @@ public class HibernateUtil {
 
 Необходимо описать все классы моделей и соотвествуюшие типы моделей в базе данных и в Java.
 
-![image](https://github.com/rmuhamedgaliev-mkdev/repair-auto-quest/blob/master/er-diagram.png?raw=true)
+![image](https://github.com/rmuhamedgaliev-mkdev/personal-finance-quest/blob/master/er-diagram.png?raw=true)
 
 Связать сущности необходимо в двусторонней связи как в [примере](http://fruzenshtein.com/bidirectional-many-to-one-association/).
 
