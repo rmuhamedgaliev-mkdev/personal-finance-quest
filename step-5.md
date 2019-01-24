@@ -16,15 +16,20 @@
 <hibernate-configuration>
     <session-factory>
         <property name="connetcion.driver_class">org.postgresql.Driver</property>
-        <property name="connection.url">jdbc:postgresql://localhost:5432/DB</property> // имя базы данных
-        <property name="connection.username">postgres</property> // имя пользователя
-        <property name="connection.password">123</property> // пароль
+        <property name="connection.url">jdbc:postgresql://localhost:5432/test</property>
+        <property name="connection.username">postgres</property>
+        <property name="connection.password">123</property>
         <property name="dialect">org.hibernate.dialect.PostgreSQL95Dialect</property>
-        <property name="default_schema">public</property> // схема БД
-        <property name="swow_sql">true</property> // отображенеи SQL запросов
-        <property name="hbm2ddl.auto">create-drop</property> // тип генерации 
+        <property name="default_schema">public</property>
+        <property name="swow_sql">true</property>
+        <property name="hbm2ddl.auto">create</property>
+        <property name="format_sql">true</property>
+        <!--<property name="hbm2ddl.auto">validate</property>-->
+        <!--<property name="hbm2ddl.auto">update</property>-->
 
-        <mapping class="autobase.models.Models"/> // путь до медли БД. Можн дописать потом
+        <mapping class="io.github.personal_finance.domain.User"/>
+        <mapping class="io.github.personal_finance.domain.Category"/>
+        <mapping class="io.github.personal_finance.domain.Expence"/>
 
     </session-factory>
 </hibernate-configuration>
@@ -61,108 +66,135 @@ public class HibernateUtil {
 Связать сущности необходимо в двусторонней связи как в [примере](http://fruzenshtein.com/bidirectional-many-to-one-association/).
 
 ```java
-package autobase;
-
 import javax.persistence.*;
-import java.io.Serializable;
+import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "models")
-public class CarModel implements Serializable {
+@Table(name = "users")
+public class User {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ID")
-    private Integer modelID;
-    @Column(name = "name")
+    @SequenceGenerator(name = "users_seq", sequenceName = "users_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq")
+    private long id;
+
+    @NotNull(message = "name of user can't be empty")
+    @Column(name = "name", length = 256)
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ID_MODEL")
-    private Manufacture manufacture;
+    @JoinColumn(name = "expence_id")
+    private Expence expence;
 
-    public CarModel() {
+    public User() {
     }
 
-    public CarModel(String name) {
+    public User(String name) {
         this.name = name;
     }
 
-    public CarModel(Integer modelID, String name) {
-        this.modelID = modelID;
-        this.name = name;
+    public long getId() {
+        return id;
     }
 
-    public Integer getModelID() {
-        return modelID;
-    }
-
-    public void setModelID(Integer modelID) {
-        this.modelID = modelID;
-    }
 
     public String getName() {
         return name;
     }
 
-    public Manufacture getManufacture() {
-        return manufacture;
-    }
-
-    public void setManufacture(Manufacture manufacture) {
-        this.manufacture = manufacture;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
+
+    public void setExpence(Expence expence) {
+        this.expence = expence;
+    }
 }
+
 ```
 
 ```java
-package autobase;
+package io.github.personal_finance.domain;
 
 import javax.persistence.*;
-import java.math.BigInteger;
 import java.util.List;
 
 @Entity
-@Table(name = "manufacture")
-public class Manufacture {
+@Table(name = "expence")
+public class Expence {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ID")
-    private Integer ID;
+    @SequenceGenerator(name = "expence_seq", sequenceName = "expence_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "expence_seq")
+    private long id;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "manufacture")
-    @Column(name = "ID_MODEL")
-    private List<CarModel> carModels;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
-    @Column(name = "manufacturer_name")
-    private String name;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "expence")
+    @Column(name = "user_id")
+    private List<User> users;
 
-    public Manufacture() {
+    public Expence(Category category) {
+        this.category = category;
     }
 
-    public Manufacture(List<CarModel> carModels, String name) {
-        this.carModels = carModels;
+    public long getId() {
+        return id;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+}
+```
+
+```java
+package io.github.personal_finance.domain;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.List;
+
+@Entity
+@Table(name = "category")
+public class Category {
+    @Id
+    @SequenceGenerator(name = "category_seq", sequenceName = "category_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "category_seq")
+    private long id;
+
+    @NotNull(message = "name of user can't be empty")
+    @Column(name = "name", length = 256)
+    private String name;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
+    @Column(name = "expence_id")
+    private List<Expence> expences;
+
+    public Category() {
+    }
+
+    public Category(String name) {
         this.name = name;
     }
 
-    public Integer getID() {
-        return ID;
+    public long getId() {
+        return id;
     }
 
-    public void setID(Integer ID) {
-        this.ID = ID;
-    }
-
-    public List<CarModel> getCarModels() {
-        return carModels;
-    }
-
-    public void setCarModels(List<CarModel> carModels) {
-        this.carModels = carModels;
-    }
 
     public String getName() {
         return name;
@@ -171,42 +203,91 @@ public class Manufacture {
     public void setName(String name) {
         this.name = name;
     }
+
+    public List<Expence> getExpences() {
+        return expences;
+    }
+
+    public void setExpences(List<Expence> expences) {
+        this.expences = expences;
+    }
 }
 
 ```
 
+Пример отправки SQL запросов в БД:
+
 ```java
-public class Main {
+package io.github.personal_finance;
+
+/*
+ * This Java source file was generated by the Gradle 'init' task.
+ */
+
+
+import io.github.personal_finance.domain.Category;
+import io.github.personal_finance.domain.Expence;
+import io.github.personal_finance.domain.User;
+import io.github.personal_finance.utils.HibernateUtils;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+
+import javax.persistence.Query;
+
+//@SpringBootConfiguration
+//@SpringBootApplication(scanBasePackages = "io.github.personal_finance")
+public class App {
+
     public static void main(String[] args) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+
+//        SpringApplication.run(App.class, args);
+
+        SessionFactory sessionFactory = HibernateUtils.getSessionFactory();
 
         Session session = sessionFactory.openSession();
         Transaction tx = session.beginTransaction();
 
-        CarModel carModel = new CarModel( "model_name");
-        carModel.setName("rio");
-        session.save(carModel);
-        tx.commit();
+        User user = new User("name");
+        session.save(user);
 
-        String queryString = "FROM CarModel cm WHERE cm.name =\'rio\'";
+        String queryString = "FROM User u WHERE u.name =\'name\'";
         Query query = session.createQuery(queryString);
-        carModel = (CarModel) query.getSingleResult();
+        user = (User) query.getSingleResult();
 
-        System.out.println("ID: "+carModel.getModelID()+"\n"+"Model: "+carModel.getName()+"\n");
+        Category category1 = new Category("category1");
+        session.save(category1);
 
-        Transaction txM = session.beginTransaction();
-
-        Manufacture manufacture = new Manufacture(Arrays.asList(carModel), "RioYo");
-        session.save(manufacture);
-        txM.commit();
+        String queryStringCategory1 = "FROM Category c WHERE c.name =\'category1\'";
+        Query queryCategory1 = session.createQuery(queryStringCategory1);
+        category1 = (Category) queryCategory1.getSingleResult();
 
 
-        tx = session.beginTransaction();
-        carModel.setManufacture(manufacture);
+        Category category2 = new Category("category2");
+        session.save(category2);
+
+        String queryStringCategory2 = "FROM Category c WHERE c.name =\'category2\'";
+        Query queryCategory2 = session.createQuery(queryStringCategory2);
+        category2 = (Category) queryCategory2.getSingleResult();
+
+        Expence expence = new Expence(category1);
+        session.save(expence);
+
+        String queryStringExpence = "FROM Expence e WHERE e.category.id =\'" + category1.getId() + "\'";
+        Query queryExpence = session.createQuery(queryStringExpence);
+        expence = (Expence) queryExpence.getSingleResult();
+
+        user.setExpence(expence);
+        session.save(user);
+
+
         tx.commit();
-        
+
         session.close();
 
     }
 }
+
 ```
+
+Теперь можете проверить БД и увидеть записаные и связанные сущности.
