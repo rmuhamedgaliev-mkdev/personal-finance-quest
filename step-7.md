@@ -413,6 +413,11 @@ public class ExpenseReceiver {
 - Написать тесты на обрабтку всех сущностей (CRUD операции) при помощи mock репозиториев (https://dzone.com/articles/spring-boot-unit-testing-and-mocking-with-mockito)
 - Реализовать в клиентском приложении запрос баланса пользователя по средством RabbitMQ
 
+## Материалы по теме
+
+- https://habr.com/ru/post/262069/
+- https://spring.io/guides/gs/messaging-rabbitmq/
+- https://docs.spring.io/spring-amqp/docs/2.1.3.RELEASE/reference/html/
 
 
 
