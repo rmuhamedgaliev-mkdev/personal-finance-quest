@@ -13,34 +13,29 @@
 ```bash
 # rmuhamedgaliev @ MacBook-Pro-Rinat in ~/Projects/personal-finance on git:master x [0:33:26]
 $ tree
+$ tree
 .
-├── bin
-│   ├── main
-│   │   └── App.class
-│   └── test
-│   └── AppTest.class
 ├── build.gradle
 ├── gradle
-│   └── wrapper
-│   ├── gradle-wrapper.jar
-│   └── gradle-wrapper.properties
+│   └── wrapper
+│       ├── gradle-wrapper.jar
+│       └── gradle-wrapper.properties
 ├── gradlew
 ├── gradlew.bat
 ├── settings.gradle
 └── src
     ├── main
-    │   └── java
-    │   └── io
-    │   └── github
-    │   └── rmuhamedgaliev
-    │   ├── App.java
-    │   ├── controller
-    │   │   └── GreetingController.java
-    │   └── model
-    │   └── Greeting.java
+    │   ├── java
+    │   │   └── io
+    │   │       └── github
+    │   │           └── rmuhamedgaliev
+    │   │               └── App.java
+    │   └── resources
     └── test
-        └── java
-            └── AppTest.java
+        ├── java
+        │   └── pf
+        │       └── AppTest.java
+        └── resources
 ```
 
 
@@ -452,7 +447,6 @@ curl -X POST "http://localhost:8080/users\
   "default": "1"
 }
 ```
-
 
 ---
 
